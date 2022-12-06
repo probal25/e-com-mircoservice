@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:mysql://localhost:3306/inventory_service</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="product_service@localhost" uuid="505e8ef9-882e-457c-a86b-fdbfc46a91a5">
+      <driver-ref>mongo</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.dbschema.MongoJdbcDriver</jdbc-driver>
+      <jdbc-url>mongodb://localhost:27017/product_service</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
