@@ -3,6 +3,7 @@ package com.probal.orderservice.service;
 import com.probal.orderservice.dto.request.OrderLineItemsDto;
 import com.probal.orderservice.dto.request.OrderRequest;
 import com.probal.orderservice.dto.response.InventoryResponse;
+import com.probal.orderservice.dto.response.Response;
 import com.probal.orderservice.model.Order;
 import com.probal.orderservice.model.OrderLineItems;
 import com.probal.orderservice.repository.OrderRepository;
@@ -26,7 +27,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient webClient;
 
-    public void placeOrder(OrderRequest orderRequest) {
+    public Response<String> placeOrder(OrderRequest orderRequest) {
+        Response<String> response = new Response<>();
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
 
@@ -41,6 +43,7 @@ public class OrderService {
                 .toList();
 
         // communicate with inventory service
+        log.info("Communication with [ {} ] Service", "INVENTORY");
         InventoryResponse[] inventoryResponses = webClient.get()
                 .uri("http://localhost:8003/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCodes", skuCodes).build())
@@ -49,14 +52,24 @@ public class OrderService {
                 .block();
 
         assert inventoryResponses != null;
+
+        if (inventoryResponses.length == 0) {
+            response = response.buildResponse(404, "Not found", "No product found with given skucodes");
+            return response;
+        }
+
         boolean allProductsIsInStock = Arrays.stream(inventoryResponses).allMatch(InventoryResponse::isInStock);
 
         if (Boolean.TRUE.equals(allProductsIsInStock)) {
-            orderRepository.save(order);
+            order = orderRepository.save(order);
         } else {
-            throw new IllegalArgumentException("Not Available");
+            response = response.buildResponse(404, "N/A", "Not Available");
+            return response;
         }
+
         log.info("ORDER WITH NUMBER [ {} ] HAS BEEN PLACED", order.getOrderNumber());
+        response = response.buildResponse(200, "success", "Order has been placed");
+        return response;
     }
 
     private OrderLineItems mapFromDto(OrderLineItemsDto orderLineItemsDto) {

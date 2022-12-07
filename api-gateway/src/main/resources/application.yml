@@ -1,0 +1,45 @@
+# APPLICATION PROPERTIES
+spring:
+  application:
+    name: GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: PRODUCT-SERVICE
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/product/**
+        - id: ORDER-SERVICE
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/order/**
+        - id: INVENTORY-SERVICE
+          uri: lb://INVENTORY-SERVICE
+          predicates:
+            - Path=/api/inventory/**
+        - id: DISCOVERY-SERVER
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka/web
+          filters:
+            - SetPath=/
+        - id: DISCOVERY-SERVER-STATIC
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka/**
+
+# EUREKA CONFIG
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka
+
+# LOGGING
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
+          route: INFO

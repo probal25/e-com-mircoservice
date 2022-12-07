@@ -2,6 +2,7 @@ package com.probal.productservice.controller;
 
 import com.probal.productservice.dto.request.ProductRequest;
 import com.probal.productservice.dto.response.ProductResponse;
+import com.probal.productservice.dto.response.Response;
 import com.probal.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,13 +19,13 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createProduct(@RequestBody ProductRequest productRequest) {
-        productService.createProduct(productRequest);
+    public Response<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
+        return productService.createProduct(productRequest);
     }
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductResponse> getProducts() {
+    public Response<List<ProductResponse>> getProducts() {
         return productService.getProducts();
     }
 
