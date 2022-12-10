@@ -4,6 +4,7 @@ import com.probal.orderservice.dto.request.OrderRequest;
 import com.probal.orderservice.dto.response.Response;
 import com.probal.orderservice.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,13 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
+    @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethodCB")
+//    @RateLimiter(name = "inventory", fallbackMethod = "fallbackMethodRL")
     public Response<String> placeOrder(@RequestBody OrderRequest orderRequest) {
         return orderService.placeOrder(orderRequest);
     }
 
-    public Response<String> fallbackMethod(OrderRequest orderRequest, RuntimeException exception) {
+    public Response<String> fallbackMethodCB(OrderRequest orderRequest, RuntimeException exception) {
         Response<String> response = new Response<>();
         response.setCode(888);
         response.setResponseMessage("Please try again later");

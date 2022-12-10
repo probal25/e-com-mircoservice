@@ -1,0 +1,60 @@
+# spring properties
+spring:
+  application:
+    name: ORDER_SERVICE
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/order_service
+    username: root
+    password: mysql
+  jpa:
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8002
+
+# eureka config
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka
+
+
+# actuator config
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+# Resilinece4j Properties
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        sliding-window-size: 5
+        sliding-window-type: COUNT_BASED
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 15s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+  retry:
+    instances:
+      inventory:
+        max-attempts: 5
+        wait-duration: 10s
+  ratelimiter:
+    instances:
+      inventory:
+        registerHealthIndicator: false
+        limitForPeriod: 10
+        limitRefreshPeriod: 10s
+        timeoutDuration: 3s
